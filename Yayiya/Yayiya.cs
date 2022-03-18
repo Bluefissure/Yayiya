@@ -23,7 +23,7 @@ namespace Yayiya
             var plugins = ActGlobals.oFormActMain.ActPlugins;
             foreach (var plugin in plugins)
                 if (plugin.pluginFile.Name.ToUpper().Contains("FFXIV_ACT_Plugin".ToUpper()) &&
-                    plugin.lblPluginStatus.Text.ToUpper().Contains("FFXIV Plugin Started.".ToUpper()))
+                    plugin.lblPluginStatus.Text.ToUpper().Contains("Started.".ToUpper()))
                     ffxivPlugin = (FFXIV_ACT_Plugin.FFXIV_ACT_Plugin)plugin.pluginObj;
 
             if (ffxivPlugin == null)
