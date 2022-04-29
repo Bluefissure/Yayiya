@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Advanced_Combat_Tracker;
 using FFXIV_ACT_Plugin.Common;
 using Yayiya.Structures;
+using System.Runtime.InteropServices;
 
 namespace Yayiya
 {
@@ -39,6 +40,7 @@ namespace Yayiya
                 var networkReceivedDelegateType = typeof(NetworkReceivedDelegate);
                 var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
                 subs.GetType().GetEvent("NetworkReceived").RemoveEventHandler(subs, networkReceivedDelegate);
+                control.SaveSettings();
                 statusLabel.Text = "Exit :|";
             }
             else
@@ -60,6 +62,7 @@ namespace Yayiya
             var networkReceivedDelegate = Delegate.CreateDelegate(networkReceivedDelegateType, (object)this, "NetworkReceived", true);
             subs.GetType().GetEvent("NetworkReceived").AddEventHandler(subs, networkReceivedDelegate);
             initialized = true;
+            control.LoadSettings();
             statusLabel.Text = "Wroking :D";
         }
 
@@ -72,7 +75,7 @@ namespace Yayiya
                 var listing = MarketBoardCurrentOfferings.Read(message.Skip(0x20).ToArray());
                 if (listing.ListingIndexStart == 0)
                 {
-                    var minPrice = listing.ItemListings[0].PricePerUnit;
+                    var minPrice = GetMinPrice(listing);
                     double targetPrice = minPrice;
                     if (control.YaCombo.SelectedIndex == 0)
                     {
@@ -93,12 +96,68 @@ namespace Yayiya
                         targetPrice = minPrice * (1.0 - (yaPercentage * 1.0 / 100.0));
                     }
                     uint finalPrice = (uint)Math.Max(1, (int)targetPrice);
-                    Thread thread = new(() => Clipboard.SetText(finalPrice.ToString()));
+                    Thread thread = new(() => Clipboard.SetDataObject(finalPrice.ToString(), true, 10, 100));
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start();
                     thread.Join();
                 }
             }
+        }
+
+        public uint GetMinPrice(MarketBoardCurrentOfferings listing)
+        {
+            bool isHQPrice = false;
+            if(control.radioButtonAlwaysHQ.Checked)
+            {
+                isHQPrice = true;
+            }
+            if (control.radioButtonHandle.Checked)
+            {
+                isHQPrice = control.comboBoxKey.SelectedIndex switch
+                {
+                    //LCtrl RCtrl
+                    0 => KeyPressCheck(new int[] { 162, 163 }),
+                    //LAlt RAlt
+                    1 => KeyPressCheck(new int[] { 164, 165 }),
+                    //LShift RShift
+                    2 => KeyPressCheck(new int[] { 160, 161 }),
+
+                    _ => false,
+                };
+            }
+            
+            int index = 0;
+            if (isHQPrice)
+            {
+                foreach (var item in listing.ItemListings)
+                {
+                    if (item.IsHq)
+                    {
+                        break;
+                    }
+                    index++;
+                }
+                if (index == listing.ItemListings.Count)
+                {
+                    index = 0;
+                }
+            }
+            return listing.ItemListings[index].PricePerUnit;
+        }
+
+        [DllImport("user32.dll")]
+        public static extern int GetAsyncKeyState(int vKey);
+
+        public bool KeyPressCheck(int[] keycodes)
+        {
+            foreach (var keycode in keycodes)
+            {
+                if (GetAsyncKeyState(keycode) != 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
