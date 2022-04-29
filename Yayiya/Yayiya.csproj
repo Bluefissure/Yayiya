@@ -38,15 +38,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Advanced Combat Tracker">
-      <HintPath>..\..\..\..\..\ACT\Advanced Combat Tracker.exe</HintPath>
+      <HintPath>..\..\IisFish2\Advanced Combat Tracker.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin">
-      <HintPath>E:\Game\FFXIVTools\FFXIV_ACT_Plugin_SDK\FFXIV_ACT_Plugin.dll</HintPath>
+      <HintPath>..\..\IisFish2\FFXIV_ACT_Plugin.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="FFXIV_ACT_Plugin.Common">
-      <HintPath>E:\Game\FFXIVTools\FFXIV_ACT_Plugin_SDK\FFXIV_ACT_Plugin.Common.dll</HintPath>
+      <HintPath>..\..\IisFish2\FFXIV_ACT_Plugin.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
